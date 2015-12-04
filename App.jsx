@@ -1,9 +1,21 @@
+const {
+    AppCanvas,
+    AppBar,
+    Styles,
+    RaisedButton,
+    Checkbox,
+    DatePicker,
+    TextField
+    } = mui;
+
+const LoginButtons = BlazeToReact('loginButtons');
+
 // App component - represents the whole app
 App = React.createClass({
- 
+
   // This mixin makes the getMeteorData method work
   mixins: [ReactMeteorData],
- 
+
   getInitialState() {
     return {
       hideCompleted: false
@@ -13,19 +25,19 @@ App = React.createClass({
   // Loads items from the Tasks collection and puts them on this.data.tasks
   getMeteorData() {
     let query = {};
- 
+
     if (this.state.hideCompleted) {
       // If hide completed is checked, filter tasks
       query = {checked: {$ne: true}};
     }
- 
+
     return {
       tasks: Tasks.find(query, {sort: {createdAt: -1}}).fetch(),
       incompleteCount: Tasks.find({checked: {$ne: true}}).count(),
       currentUser: Meteor.user()
     };
   },
- 
+
   renderTasks() {
     // Get tasks from this.data.tasks
     return this.data.tasks.map((task) => {
@@ -39,15 +51,15 @@ App = React.createClass({
         showPrivateButton={showPrivateButton} />
     });
   },
- 
+
   handleSubmit(event) {
     event.preventDefault();
- 
+
     // Find the text field via the React ref
     var text = React.findDOMNode(this.refs.textInput).value.trim();
- 
+
     Meteor.call("addTask", text);
- 
+
     // Clear form
     React.findDOMNode(this.refs.textInput).value = "";
   },
@@ -61,32 +73,44 @@ App = React.createClass({
   render() {
     return (
       <div className="container">
+      <LoginButtons />
+      { this.data.currentUser ?
+        <div className="goal-count">You have ({this.data.incompleteCount}) goals for the day</div> : ''
+      }
+      <div className="logo"></div>
+      <h1 className="title">Yearn</h1>
+      <div className="subtitle">Achieve something everyday</div>
+
         <header>
-          <h1>Todo List ({this.data.incompleteCount})</h1>
+          {/*Show form only when user logged in*/}
+
+
+          { this.data.currentUser ?
           <label className="hide-completed">
-            <input
-              type="checkbox"
+            <Checkbox
               readOnly={true}
               checked={this.state.hideCompleted}
               onClick={this.toggleHideCompleted} />
             Hide Completed Tasks
-          </label>
+          </label> : ''
+          }
+        </header>
 
-          <AccountsUIWrapper />
-          {/*Show form only when user logged in*/}
           { this.data.currentUser ?
-            <form className="new-task" onSubmit={this.handleSubmit} >
+            <TextField className="new-task" onSubmit={this.handleSubmit} >
               <input
                 type="text"
                 ref="textInput"
                 placeholder="Type to add new tasks" />
-            </form> : ''
+            </TextField> : ''
           }
-        </header>
- 
-        <ul>
-          {this.renderTasks()}
-        </ul>
+
+          { this.data.currentUser ?
+            <ul>
+              {this.renderTasks()}
+            </ul> : <h3> Sign in above to your account to start achieving </h3>
+          }
+
       </div>
     );
   }

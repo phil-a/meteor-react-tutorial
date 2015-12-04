@@ -1,3 +1,10 @@
+const {
+      Checkbox,
+      List,
+      ListDivider,
+      ListItem
+    } = mui;
+
 // Task component - this represents a single todo item
 Task = React.createClass({
   propTypes: {
@@ -24,16 +31,17 @@ Task = React.createClass({
   render() {
     //Change className of task (for css styling)
     //Add "checked" and/or "private" to className when needed
-    const taskClassName = (this.props.task.checked ? "checked" : "") + " " + 
+    const taskClassName = (this.props.task.checked ? "checked" : "") + " " +
       (this.props.task.private ? "private" : "");
 
     return (
-      <li className={taskClassName}>
+    <div>
+      <ListItem className={taskClassName}>
         <button className="delete" onClick={this.deleteThisTask}>
           &times;
         </button>
-        
-        <input
+
+        <Checkbox
           type="checkbox"
           readOnly={true}
           checked={this.props.task.checked}
@@ -43,13 +51,15 @@ Task = React.createClass({
         { this.props.showPrivateButton ? (
           <button className="toggle-private" onClick={this.togglePrivate}>
             { this.props.task.private ? "Private" : "Public" }
-          </button>  
+          </button>
           ) : '' }
 
         <span className="text">
           <strong>{this.props.task.username}</strong>: {this.props.task.text}
         </span>
-      </li>
+      </ListItem>
+      <ListDivider/>
+      </div>
     );
   }
 });
